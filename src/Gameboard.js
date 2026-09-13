@@ -4,6 +4,7 @@ class Gameboard {
     this.ships = [];
     this.board = Array.from({ length: size }, () => Array(size).fill(null));
     this.missedAttacks = [];
+    this.attackedCoords = new Set();
   }
 
   placeShip(ship, [row, col], direction = "horizontal") {
@@ -29,6 +30,27 @@ class Gameboard {
 
   getShipAt([row, col]) {
     return this.board[row][col];
+  }
+
+  receiveAttack([row, col]) {
+    const key = `${row},${col}`;
+
+    if (this.attackedCoords.has(key)) {
+      throw new Error("This coordinate has already been attacked");
+    }
+    this.attackedCoords.add(key);
+
+    const target = this.board[row][col];
+
+    if (target !== null) {
+      target.hit();
+    } else {
+      this.missedAttacks.push([row, col]);
+    }
+  }
+
+  allShipsSunk() {
+    return this.ships.every(({ ship }) => ship.isSunk());
   }
 }
 
