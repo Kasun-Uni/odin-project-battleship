@@ -1,7 +1,7 @@
 import "./style.css";
 import Player from "./Player.js";
 import Ship from "./Ship.js";
-import { renderBoard } from "./dom.js";
+import { renderBoard, attachBoardClickHandler } from "./dom.js";
 
 const realPlayer = new Player("real");
 const computerPlayer = new Player("computer");
@@ -17,5 +17,27 @@ function placeHardcodedShips(player) {
 placeHardcodedShips(realPlayer);
 placeHardcodedShips(computerPlayer);
 
-renderBoard(realPlayer.gameboard, "player-board", true);
-renderBoard(computerPlayer.gameboard, "computer-board", false);
+function renderAll() {
+  renderBoard(realPlayer.gameboard, "player-board", true);
+  renderBoard(computerPlayer.gameboard, "computer-board", false);
+}
+
+function handlePlayerAttack([row, col]) {
+  const key = `${row},${col}`;
+
+  // Ignore clicks on already-attacked cells
+  if (computerPlayer.gameboard.attackedCoords.has(key)) {
+    return;
+  }
+
+  computerPlayer.gameboard.receiveAttack([row, col]);
+  renderAll();
+
+  // Computer's turn
+  const [compRow, compCol] = computerPlayer.randomAttack(realPlayer.gameboard);
+  realPlayer.gameboard.receiveAttack([compRow, compCol]);
+  renderAll();
+}
+
+attachBoardClickHandler("computer-board", handlePlayerAttack);
+renderAll();

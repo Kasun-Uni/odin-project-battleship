@@ -25,3 +25,17 @@ export function renderBoard(gameboard, containerId, revealShips) {
     }
   }
 }
+
+export function attachBoardClickHandler(containerId, onCellClick) {
+  const container = document.getElementById(containerId);
+
+  container.addEventListener("click", (event) => {
+    const cell = event.target;
+    if (!cell.classList.contains("cell")) return;
+
+    const row = parseInt(cell.dataset.row);
+    const col = parseInt(cell.dataset.col);
+
+    onCellClick([row, col]);
+  });
+}
