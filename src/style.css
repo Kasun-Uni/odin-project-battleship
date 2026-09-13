@@ -1,0 +1,44 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 2rem;
+  text-align: center;
+}
+
+.boards {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, 30px);
+  grid-template-rows: repeat(10, 30px);
+  gap: 2px;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  background-color: #cbd5e1;
+  border: 1px solid #94a3b8;
+}
+
+.cell.ship {
+  background-color: #64748b;
+}
+
+.cell.hit {
+  background-color: #ef4444;
+}
+
+.cell.miss {
+  background-color: #ffffff;
+}
