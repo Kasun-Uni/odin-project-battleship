@@ -1,26 +1,19 @@
 import "./style.css";
 import Player from "./Player.js";
-import Ship from "./Ship.js";
 import { renderBoard, attachBoardClickHandler } from "./dom.js";
+
+const SHIP_LENGTHS = [5, 4, 3, 3, 2];
 
 const realPlayer = new Player("real");
 const computerPlayer = new Player("computer");
 
 const messageEl = document.getElementById("game-message");
 const computerBoardEl = document.getElementById("computer-board");
+const randomizeBtn = document.getElementById("randomize-btn");
+const startBtn = document.getElementById("start-btn");
 
 let gameOver = false;
-
-function placeHardcodedShips(player) {
-  player.gameboard.placeShip(new Ship(5), [0, 0], "horizontal");
-  player.gameboard.placeShip(new Ship(4), [2, 0], "horizontal");
-  player.gameboard.placeShip(new Ship(3), [4, 0], "horizontal");
-  player.gameboard.placeShip(new Ship(3), [6, 0], "vertical");
-  player.gameboard.placeShip(new Ship(2), [8, 0], "horizontal");
-}
-
-placeHardcodedShips(realPlayer);
-placeHardcodedShips(computerPlayer);
+let gameStarted = false;
 
 function renderAll() {
   renderBoard(realPlayer.gameboard, "player-board", true);
@@ -34,7 +27,7 @@ function endGame(winnerText) {
 }
 
 function handlePlayerAttack([row, col]) {
-  if (gameOver) return;
+  if (gameOver || !gameStarted) return;
 
   const key = `${row},${col}`;
   if (computerPlayer.gameboard.attackedCoords.has(key)) {
@@ -49,7 +42,6 @@ function handlePlayerAttack([row, col]) {
     return;
   }
 
-  // Computer's turn
   const [compRow, compCol] = computerPlayer.randomAttack(realPlayer.gameboard);
   realPlayer.gameboard.receiveAttack([compRow, compCol]);
   renderAll();
@@ -58,6 +50,20 @@ function handlePlayerAttack([row, col]) {
     endGame("Computer wins! All your ships have been sunk.");
   }
 }
+
+randomizeBtn.addEventListener("click", () => {
+  realPlayer.randomlyPlaceShips(SHIP_LENGTHS);
+  renderAll();
+  startBtn.disabled = false;
+});
+
+startBtn.addEventListener("click", () => {
+  computerPlayer.randomlyPlaceShips(SHIP_LENGTHS);
+  gameStarted = true;
+  computerBoardEl.classList.remove("disabled");
+  messageEl.textContent = "Game started! Attack the enemy board.";
+  renderAll();
+});
 
 attachBoardClickHandler("computer-board", handlePlayerAttack);
 renderAll();

@@ -42,3 +42,23 @@ test("randomAttack never picks the same coordinate twice", () => {
     attacked.add(key);
   }
 });
+
+test("randomlyPlaceShips places all given ships without overlapping or going off-board", () => {
+  const player = new Player("real");
+  const shipLengths = [5, 4, 3, 3, 2];
+
+  player.randomlyPlaceShips(shipLengths);
+
+  expect(player.gameboard.ships.length).toBe(5);
+
+  // Confirm every ship's coordinates are all within bounds
+  player.gameboard.ships.forEach(({ coordinates }) => {
+    coordinates.forEach(([row, col]) => {
+      expect(row).toBeGreaterThanOrEqual(0);
+      expect(row).toBeLessThan(player.gameboard.size);
+      expect(col).toBeGreaterThanOrEqual(0);
+      expect(col).toBeLessThan(player.gameboard.size);
+    });
+  });
+});
+

@@ -110,3 +110,15 @@ test("allShipsSunk returns true when every ship is sunk", () => {
 
   expect(gameboard.allShipsSunk()).toBe(true);
 });
+
+test("placeShip throws an error if it overlaps another ship", () => {
+  const gameboard = new Gameboard();
+  const ship1 = new Ship(3);
+  const ship2 = new Ship(2);
+
+  gameboard.placeShip(ship1, [0, 0], "horizontal");
+
+  expect(() => {
+    gameboard.placeShip(ship2, [0, 1], "horizontal");
+  }).toThrow();
+});

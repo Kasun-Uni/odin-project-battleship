@@ -18,6 +18,10 @@ class Gameboard {
         throw new Error("Ship placement is out of bounds");
       }
 
+      if (this.board[r][c] !== null) {
+        throw new Error("Ship placement overlaps another ship");
+      }
+
       coordinates.push([r, c]);
     }
 
