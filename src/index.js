@@ -6,6 +6,11 @@ import { renderBoard, attachBoardClickHandler } from "./dom.js";
 const realPlayer = new Player("real");
 const computerPlayer = new Player("computer");
 
+const messageEl = document.getElementById("game-message");
+const computerBoardEl = document.getElementById("computer-board");
+
+let gameOver = false;
+
 function placeHardcodedShips(player) {
   player.gameboard.placeShip(new Ship(5), [0, 0], "horizontal");
   player.gameboard.placeShip(new Ship(4), [2, 0], "horizontal");
@@ -22,10 +27,16 @@ function renderAll() {
   renderBoard(computerPlayer.gameboard, "computer-board", false);
 }
 
-function handlePlayerAttack([row, col]) {
-  const key = `${row},${col}`;
+function endGame(winnerText) {
+  gameOver = true;
+  messageEl.textContent = winnerText;
+  computerBoardEl.classList.add("disabled");
+}
 
-  // Ignore clicks on already-attacked cells
+function handlePlayerAttack([row, col]) {
+  if (gameOver) return;
+
+  const key = `${row},${col}`;
   if (computerPlayer.gameboard.attackedCoords.has(key)) {
     return;
   }
@@ -33,10 +44,19 @@ function handlePlayerAttack([row, col]) {
   computerPlayer.gameboard.receiveAttack([row, col]);
   renderAll();
 
+  if (computerPlayer.gameboard.allShipsSunk()) {
+    endGame("You win! All enemy ships have been sunk.");
+    return;
+  }
+
   // Computer's turn
   const [compRow, compCol] = computerPlayer.randomAttack(realPlayer.gameboard);
   realPlayer.gameboard.receiveAttack([compRow, compCol]);
   renderAll();
+
+  if (realPlayer.gameboard.allShipsSunk()) {
+    endGame("Computer wins! All your ships have been sunk.");
+  }
 }
 
 attachBoardClickHandler("computer-board", handlePlayerAttack);
